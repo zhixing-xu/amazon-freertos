@@ -1,0 +1,43 @@
+WD    = $(abspath .)
+LIB   = $(abspath ../lib)
+TOP   = $(abspath ..)
+
+#ENTRY = DHCPReplies
+ENTRY = DNSReply
+
+SHELL = bash
+
+INC = \
+	-I$(LIB)/ \
+	-I$(LIB)/include/ \
+	-I$(LIB)/include/private \
+	-I$(TOP)/demos/ti/cc3220_launchpad/common/config_files/ \
+  -I$(TOP)/demos/ti/cc3220_launchpad/common/application_code/ti_code/ \
+	-I$(TOP)/demos/espressif/esp32_devkitc_esp_wrover_kit/common/application_code/espressif_code/freertos/include/freertos/ \
+	-I$(LIB)/third_party/mcu_vendor/ti/SimpleLink_CC32xx/v2_10_00_04/source/ \
+  -I$(LIB)/FreeRTOS/portable/Rowley/MSP430F449/ \
+	-I$(LIB)/FreeRTOS/portable/Paradigm/Tern_EE/small/ \
+	-I$(LIB)/FreeRTOS-Plus-TCP/include/ \
+	-I$(LIB)/FreeRTOS-Plus-TCP/source/portable/Compiler/GCC/ \
+
+# infer flags
+INFEROUT = infer-out
+INFER    = infer
+CLANG    = -- clang
+INFERBO  = -a checkers --bufferoverrun
+
+CC = gcc
+EXECUTEABLE = $(ENTRY)
+CFLAGS = -c 
+
+all: freertos
+
+freertos:
+	$(CC) $(CFLAGS) $(INC)
+
+infer:
+	$(INFER) $(INFERBO) run $(CLANG) $(INC) -c $(ENTRY).c
+
+
+clean:
+	$(RM) -r $(INFEROUT) 

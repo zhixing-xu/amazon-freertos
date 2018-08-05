@@ -1,0 +1,54 @@
+WD    = $(abspath .)
+LIB   = $(abspath ../lib)
+TOP   = $(abspath ..)
+
+#ENTRY = DHCPReplies
+ENTRY = DNSReply
+
+SHELL = bash
+
+INC = \
+	-I$(LIB)/ \
+	-I$(LIB)/include/ \
+	-I$(LIB)/include/private \
+	-I$(TOP)/demos/ti/cc3220_launchpad/common/config_files/ \
+  -I$(TOP)/demos/ti/cc3220_launchpad/common/application_code/ti_code/ \
+	-I$(TOP)/demos/espressif/esp32_devkitc_esp_wrover_kit/common/application_code/espressif_code/freertos/include/freertos/ \
+	-I$(LIB)/third_party/mcu_vendor/ti/SimpleLink_CC32xx/v2_10_00_04/source/ \
+  -I$(LIB)/FreeRTOS/portable/Rowley/MSP430F449/ \
+	-I$(LIB)/FreeRTOS/portable/Paradigm/Tern_EE/small/ \
+	-I$(LIB)/FreeRTOS-Plus-TCP/include/ \
+	-I$(LIB)/FreeRTOS-Plus-TCP/source/portable/Compiler/GCC/ \
+
+FREERTOS_CFLAGS = \
+	-DHAVE_MREMAP=0 \
+	-DLIBSA_LONGLONG_PRINTF \
+	-DAPCEA_CFG_CLOSE_DEBUG_BARS \
+	-mgeneral-regs-only \
+	-g \
+	-nostartfiles \
+	-nodefaultlibs \
+	-nostdlib \
+	-Wformat \
+	-Wimplicit \
+	-Werror \
+	-fno-builtin \
+	-ffunction-sections \
+	-fdata-sections \
+	-O2 \
+	-D_BASE_FILE_="" \
+	#-include $(APCEA_ROOT)/targets/apcea_cfg_emul/obj_and_deps/sil_v2_arm64//gen_config.h \
+
+INFEROUT = infer-out
+INFER    = infer
+CLANG    = -- clang
+INFERBO  = -a checkers --bufferoverrun
+
+default: infer
+
+infer:
+	$(INFER) $(INFERBO) run -- gcc $(INC) -c $(ENTRY).c
+
+
+clean:
+	$(RM) -r $(INFEROUT) 
