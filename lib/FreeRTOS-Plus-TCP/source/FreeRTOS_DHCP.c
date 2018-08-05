@@ -203,7 +203,7 @@ static void prvSendDHCPDiscover( void );
 /*
  * Interpret message received on the DHCP socket.
  */
-static BaseType_t prvProcessDHCPReplies( BaseType_t xExpectedMessageType );
+BaseType_t prvProcessDHCPReplies( BaseType_t xExpectedMessageType );
 
 /*
  * Generate a DHCP request packet, and send it on the DHCP socket.
@@ -609,7 +609,7 @@ static void prvInitialiseDHCP( void )
 }
 /*-----------------------------------------------------------*/
 
-static BaseType_t prvProcessDHCPReplies( BaseType_t xExpectedMessageType )
+BaseType_t prvProcessDHCPReplies( BaseType_t xExpectedMessageType )
 {
 uint8_t *pucUDPPayload, *pucLastByte;
 struct freertos_sockaddr xClient;

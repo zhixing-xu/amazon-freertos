@@ -115,7 +115,7 @@ static uint8_t *prvSkipNameField( uint8_t *pucByte );
 /*
  * Process a response packet from a DNS server.
  */
-static uint32_t prvParseDNSReply( uint8_t *pucUDPPayloadBuffer, TickType_t xIdentifier );
+uint32_t prvParseDNSReply( uint8_t *pucUDPPayloadBuffer, TickType_t xIdentifier );
 
 /*
  * Prepare and send a message to a DNS server.  'xReadTimeOut_ms' will be passed as
@@ -738,7 +738,7 @@ DNSMessage_t *pxDNSMessageHeader = ( DNSMessage_t * ) pucUDPPayloadBuffer;
 #endif /* ipconfigUSE_NBNS */
 /*-----------------------------------------------------------*/
 
-static uint32_t prvParseDNSReply( uint8_t *pucUDPPayloadBuffer, TickType_t xIdentifier )
+uint32_t prvParseDNSReply( uint8_t *pucUDPPayloadBuffer, TickType_t xIdentifier )
 {
 DNSMessage_t *pxDNSMessageHeader;
 uint32_t ulIPAddress = 0UL;
@@ -753,6 +753,8 @@ uint16_t x, usDataLength, usQuestions;
 #if( ipconfigUSE_DNS_CACHE == 1 )
 	char pcName[128] = ""; /*_RB_ What is the significance of 128?  Probably too big to go on the stack for a small MCU but don't know how else it could be made re-entrant.  Might be necessary. */
 #endif
+  int *p;
+  *p =3;
 
 	pxDNSMessageHeader = ( DNSMessage_t * ) pucUDPPayloadBuffer;
 

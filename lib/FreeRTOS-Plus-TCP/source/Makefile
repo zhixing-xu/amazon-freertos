@@ -1,9 +1,8 @@
-WD    = $(abspath .)
-LIB   = $(abspath ../lib)
-TOP   = $(abspath ..)
+LIB   = $(HOME)/benchs/amazon-freertos/lib
+TOP   = $(LIB)/..
 
-#ENTRY = DHCPReplies
-ENTRY = DNSReply
+ENTRY = DHCPReplies
+#ENTRY = DNSReply
 
 SHELL = bash
 
@@ -20,29 +19,16 @@ INC = \
 	-I$(LIB)/FreeRTOS-Plus-TCP/include/ \
 	-I$(LIB)/FreeRTOS-Plus-TCP/source/portable/Compiler/GCC/ \
 
-SRC = $(wildcard ../lib/FreeRTOS-Plus-TCP/source/*.c)
-OBJ = $(SRC:.c=.o)
-
-# infer flags
-INFEROUT = infer-out
-INFER    = infer
-CLANG    = -- clang
-INFERBO  = -a checkers --bufferoverrun
-
 CC = gcc
 
-all: freertos
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
+
+#all:
 
 freertos: $(OBJ)
 	$(CC) $(CFLAGS) $(INC) -o $@ $^ 
-	#$(CC) $(CFLAGS) $(INC) -o $(ENTRY).c
-	#$(CC) $(CFLAGS) $(INC) $(ENTRY).c
+
 .c.o: 
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
-infer:
-	$(INFER) $(INFERBO) run $(CLANG) $(INC) -c $(ENTRY).c
-
-
-clean:
-	$(RM) -r $(INFEROUT) 
