@@ -17,7 +17,9 @@ INC = \
   -I$(LIB)/FreeRTOS/portable/Rowley/MSP430F449/ \
 	-I$(LIB)/FreeRTOS/portable/Paradigm/Tern_EE/small/ \
 	-I$(LIB)/FreeRTOS-Plus-TCP/include/ \
-	-I$(LIB)/FreeRTOS-Plus-TCP/source/portable/Compiler/GCC/ \
+	-I$(LIB)/FreeRTOS-Plus-TCP/source/portable/Compiler/CompilerName/ \
+
+VPATH=$(LIB)/include/private:$(LIB)/FreeRTOS-PLUS-TCP/source/
 
 CC = gcc
 
@@ -31,4 +33,7 @@ freertos: $(OBJ)
 
 .c.o: 
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
+
+clean:
+	rm *.o
 

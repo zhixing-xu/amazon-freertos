@@ -20,8 +20,26 @@ INC = \
 	-I$(LIB)/FreeRTOS-Plus-TCP/include/ \
 	-I$(LIB)/FreeRTOS-Plus-TCP/source/portable/Compiler/GCC/ \
 
-SRC = $(wildcard ../lib/FreeRTOS-Plus-TCP/source/*.c)
-OBJ = $(SRC:.c=.o)
+#DIRS := $(LIB)/:$(LIB)/include/private:$(LIB)/FreeRTOS-PLUS-TCP/source/
+DIRS := $(LIB)/include/private $(LIB)/FreeRTOS-Plus-TCP/source/ $(LIB)/FreeRTOS/
+#SOURCE_FILES := $(foreach d, $(DIRS), $(d))
+SOURCE_FILES := $(foreach d, $(DIRS), $(wildcard $(d)*.c) )
+
+# Create an object file of every cpp file
+OBJECTS = $(patsubst %.c, %.o, $(SOURCE_FILES))
+# Dependencies
+DEPENDENCIES = $(patsubst %.c, %.d, $(SOURCE_FILES))
+
+# Create .d files
+%.d: %.c
+	$(CC) -MM $< -MT "$*.o $*.d" -MF $*.d
+
+# Make $(PROJECT) the default target
+all: freertos
+
+#SRC = $(wildcard *.c)
+#SRC := $(foreach d, $(DIRS), $(wildcard $(d)*.c) )
+#OBJ = $(SRC:.c=.o)
 
 # infer flags
 INFEROUT = infer-out
@@ -31,18 +49,20 @@ INFERBO  = -a checkers --bufferoverrun
 
 CC = gcc
 
-all: freertos
-
-freertos: $(OBJ)
+freertos: $(OBJECTS)
 	$(CC) $(CFLAGS) $(INC) -o $@ $^ 
-	#$(CC) $(CFLAGS) $(INC) -o $(ENTRY).c
-	#$(CC) $(CFLAGS) $(INC) $(ENTRY).c
+
+# Include dependencies (if there are any)
+ifneq "$(strip $(DEPENDENCIES))" ""
+	 include $(DEPENDENCIES)
+endif
+
 .c.o: 
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
 infer:
 	$(INFER) $(INFERBO) run $(CLANG) $(INC) -c $(ENTRY).c
 
-
 clean:
 	$(RM) -r $(INFEROUT) 
+	$(RM) -f *.o

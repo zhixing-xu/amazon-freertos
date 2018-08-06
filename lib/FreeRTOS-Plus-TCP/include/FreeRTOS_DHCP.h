@@ -60,8 +60,8 @@ void vDHCPProcess( BaseType_t xReset );
 /* Internal call: returns true if socket is the current DHCP socket */
 BaseType_t xIsDHCPSocket( Socket_t xSocket );
 
-//infer entry point
-BaseType_t prvProcessDHCPReplies( BaseType_t xExpectedMessageType )
+////infer entry point
+BaseType_t prvProcessDHCPReplies( BaseType_t xExpectedMessageType );
 
 /* Prototype of the hook (or callback) function that must be provided by the
 application if ipconfigUSE_DHCP_HOOK is set to 1.  See the following URL for
