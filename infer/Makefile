@@ -15,7 +15,7 @@ INC = \
   -I$(TOP)/demos/ti/cc3220_launchpad/common/application_code/ti_code/ \
 	-I$(TOP)/demos/espressif/esp32_devkitc_esp_wrover_kit/common/application_code/espressif_code/freertos/include/freertos/ \
 	-I$(LIB)/third_party/mcu_vendor/ti/SimpleLink_CC32xx/v2_10_00_04/source/ \
-  -I$(LIB)/FreeRTOS/portable/Rowley/MSP430F449/ \
+  -I$(LIB)/FreeRTOS/portable/GCC/ARM_CM0/ \
 	-I$(LIB)/FreeRTOS/portable/Paradigm/Tern_EE/small/ \
 	-I$(LIB)/FreeRTOS-Plus-TCP/include/ \
 	-I$(LIB)/FreeRTOS-Plus-TCP/source/portable/Compiler/GCC/ \
@@ -61,7 +61,7 @@ endif
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
 infer:
-	$(INFER) $(INFERBO) run $(CLANG) $(INC) -c $(ENTRY).c
+	$(INFER) $(INFERBO) run -- $(MAKE)
 
 clean:
 	$(RM) -r $(INFEROUT) 
