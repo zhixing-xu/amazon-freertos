@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <time.h>
@@ -1630,13 +1631,13 @@ typedef BaseType_t (*ShadowDeltaCallback_t)(void *, const char *, const char *, 
 typedef BaseType_t (*ShadowUpdatedCallback_t)(void *, const char *, const char *, uint32_t, MQTTBufferHandle_t);
 typedef signed int mbedtls_ssl_recv_timeout_t(void *, unsigned char *, size_t, uint32_t);
 typedef void mbedtls_ssl_set_timer_t(void *, uint32_t, uint32_t);
-typedef unsigned long long int uint64_t;
+/*typedef unsigned long long int uint64_t;*/
 typedef void (*MQTTGetTicks_t)(uint64_t *);
 typedef unsigned char uint8_t;
 typedef uint8_t * (*MQTTGetFreeBuffer_t)(uint32_t *);
 typedef void (*MQTTReturnBuffer_t)(uint8_t *);
 typedef uint32_t (*MQTTSend_t)(void *, const uint8_t *, uint32_t);
-typedef unsigned long long int uintptr_t;
+/*typedef unsigned long long int uintptr_t;*/
 typedef uintptr_t (*IterateFunction)(char *, const uint8_t *, size_t);
 typedef struct anonymous$110 x509_crt_verify_chain_item;
 
@@ -1655,6 +1656,28 @@ typedef struct xSTREAM_BUFFER$0
   // ucArray
   uint8_t ucArray[(signed long long int)sizeof(size_t)];
 } StreamBuffer_t;
+
+typedef struct xSTREAM_BUFFER
+{
+  // xTail
+  volatile size_t xTail;
+  // xHead
+  volatile size_t xHead;
+  // xLength
+  size_t xLength;
+  // xTriggerLevelBytes
+  size_t xTriggerLevelBytes;
+  // xTaskWaitingToReceive
+  volatile TaskHandle_t xTaskWaitingToReceive;
+  // xTaskWaitingToSend
+  volatile TaskHandle_t xTaskWaitingToSend;
+  // pucBuffer
+  uint8_t *pucBuffer;
+  // ucFlags
+  uint8_t ucFlags;
+  // uxStreamBufferNumber
+  UBaseType_t uxStreamBufferNumber;
+} StreamBuffer_t1;
 
 // App_OTACompleteCallback
 // file ..\..\..\common\ota\aws_ota_update_demo.c line 143
@@ -5269,7 +5292,7 @@ static uint32_t prvBuildDataStreamTopicName(char *pcNameBuffer, uint32_t ulBufSi
 static uint32_t prvBuildJobStatusTopicName(char *pcNameBuffer, uint32_t ulBufSize, const char *pacJobName);
 // prvBytesInBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1121
-static size_t prvBytesInBuffer(const StreamBuffer_t * const pxStreamBuffer);
+static size_t prvBytesInBuffer(const StreamBuffer_t1 * const pxStreamBuffer);
 // prvCacheLookup
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\FreeRTOS_ARP.c line 461
 static eARPLookupResult_t prvCacheLookup(uint32_t ulAddressToLookup, MACAddress_t * const pxMACAddress);
@@ -5518,7 +5541,7 @@ static void prvInitialiseMutex(Queue_t *pxNewQueue);
 static void prvInitialiseNewQueue(const UBaseType_t uxQueueLength, const UBaseType_t uxItemSize, uint8_t *pucQueueStorage, const uint8_t ucQueueType, Queue_t *pxNewQueue);
 // prvInitialiseNewStreamBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1141
-static void prvInitialiseNewStreamBuffer(StreamBuffer_t * const pxStreamBuffer, uint8_t * const pucBuffer, size_t xBufferSizeBytes, size_t xTriggerLevelBytes, BaseType_t xIsMessageBuffer);
+static void prvInitialiseNewStreamBuffer(StreamBuffer_t1 * const pxStreamBuffer, uint8_t * const pucBuffer, size_t xBufferSizeBytes, size_t xTriggerLevelBytes, BaseType_t xIsMessageBuffer);
 // prvInitialiseNewTask
 // file ..\..\..\..\lib\FreeRTOS\tasks.c line 834
 static void prvInitialiseNewTask(TaskFunction_t pxTaskCode, const char * const pcName, const uint32_t ulStackDepth, void * const pvParameters, UBaseType_t uxPriority, TaskHandle_t * const pxCreatedTask, TCB_t *pxNewTCB, const MemoryRegion_t * const xRegions);
@@ -5812,10 +5835,10 @@ static void prvPublishSubscribeTask(void *pvParameters);
 static uint8_t * prvReadAndAssumeCertificate(const uint8_t * const pucCertName, int32_t * const lSignerCertSize);
 // prvReadBytesFromBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1066
-static size_t prvReadBytesFromBuffer(StreamBuffer_t *pxStreamBuffer, uint8_t *pucData, size_t xMaxCount, size_t xBytesAvailable);
+static size_t prvReadBytesFromBuffer(StreamBuffer_t1 *pxStreamBuffer, uint8_t *pucData, size_t xMaxCount, size_t xBytesAvailable);
 // prvReadMessageFromBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 852
-static size_t prvReadMessageFromBuffer(StreamBuffer_t *pxStreamBuffer, void *pvRxData, size_t xBufferLengthBytes, size_t xBytesAvailable, size_t xBytesToStoreMessageLength);
+static size_t prvReadMessageFromBuffer(StreamBuffer_t1 *pxStreamBuffer, void *pvRxData, size_t xBufferLengthBytes, size_t xBytesAvailable, size_t xBytesToStoreMessageLength);
 // prvReadNameField
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\FreeRTOS_DNS.c line 675
 static uint8_t * prvReadNameField(uint8_t *pucByte, size_t xSourceLen, char *pcName, size_t xDestLen);
@@ -6205,10 +6228,10 @@ static uint8_t prvWinScaleFactor(FreeRTOS_Socket_t *pxSocket);
 static int16_t prvWriteBlock(OTA_FileContext_t * const C, int32_t iOffset, uint8_t * const pacData, uint32_t iBlockSize);
 // prvWriteBytesToBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1020
-static size_t prvWriteBytesToBuffer(StreamBuffer_t * const pxStreamBuffer, const uint8_t *pucData, size_t xCount);
+static size_t prvWriteBytesToBuffer(StreamBuffer_t1 * const pxStreamBuffer, const uint8_t *pucData, size_t xCount);
 // prvWriteMessageToBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 639
-static size_t prvWriteMessageToBuffer(StreamBuffer_t * const pxStreamBuffer, const void *pvTxData, size_t xDataLengthBytes, size_t xSpace, size_t xRequiredSpace);
+static size_t prvWriteMessageToBuffer(StreamBuffer_t1 * const pxStreamBuffer, const void *pvTxData, size_t xDataLengthBytes, size_t xSpace, size_t xRequiredSpace);
 // prvWriteNameToBuffer
 // file ..\..\..\..\lib\FreeRTOS\tasks.c line 4204
 static char * prvWriteNameToBuffer(char *pcBuffer, const char *pcTaskName);
@@ -6680,7 +6703,7 @@ UBaseType_t uxQueueMessagesWaitingFromISR(const QueueHandle_t xQueue);
 UBaseType_t uxQueueSpacesAvailable(const QueueHandle_t xQueue);
 // uxStreamBufferAdd
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\FreeRTOS_Stream_Buffer.c line 47
-size_t uxStreamBufferAdd(const StreamBuffer_t *pxBuffer, size_t uxOffset, const uint8_t *pucData, size_t uxCount);
+size_t uxStreamBufferAdd(StreamBuffer_t *pxBuffer, size_t uxOffset, const uint8_t *pucData, size_t uxCount);
 // uxStreamBufferDistance
 // file d:\tuttle\freertos\lib\freertos-plus-tcp\include\FreeRTOS_Stream_Buffer.h line 114
 static inline size_t uxStreamBufferDistance(const StreamBuffer_t *pxBuffer, const size_t uxLower, const size_t uxUpper);
@@ -6704,7 +6727,7 @@ static inline size_t uxStreamBufferFrontSpace(const StreamBuffer_t *pxBuffer);
 static inline size_t uxStreamBufferFrontSpace$link1(const StreamBuffer_t *pxBuffer$link1);
 // uxStreamBufferGet
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\FreeRTOS_Stream_Buffer.c line 130
-size_t uxStreamBufferGet(const StreamBuffer_t *pxBuffer, size_t uxOffset, uint8_t *pucData, size_t uxMaxCount, BaseType_t xPeek);
+size_t uxStreamBufferGet( StreamBuffer_t *pxBuffer, size_t uxOffset, uint8_t *pucData, size_t uxMaxCount, BaseType_t xPeek);
 // uxStreamBufferGetPtr
 // file d:\tuttle\freertos\lib\freertos-plus-tcp\include\FreeRTOS_Stream_Buffer.h line 283
 static inline size_t uxStreamBufferGetPtr(const StreamBuffer_t *pxBuffer, uint8_t **ppucData);
@@ -6959,13 +6982,13 @@ void vStartTCPEchoClientTasks_SeparateTasks(void);
 void vStartTCPEchoClientTasks_SingleTasks(void);
 // vStreamBufferClear
 // file d:\tuttle\freertos\lib\freertos-plus-tcp\include\FreeRTOS_Stream_Buffer.h line 83
-static inline void vStreamBufferClear(const StreamBuffer_t *pxBuffer);
+static inline void vStreamBufferClear( StreamBuffer_t *pxBuffer);
 // vStreamBufferDelete
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 335
 void vStreamBufferDelete(StreamBufferHandle_t xStreamBuffer);
 // vStreamBufferMoveMid
 // file d:\tuttle\freertos\lib\freertos-plus-tcp\include\FreeRTOS_Stream_Buffer.h line 194
-static inline void vStreamBufferMoveMid(const StreamBuffer_t *pxBuffer, size_t uxCount);
+static inline void vStreamBufferMoveMid( StreamBuffer_t *pxBuffer, size_t uxCount);
 // vStreamBufferSetStreamBufferNumber
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1183
 void vStreamBufferSetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer, UBaseType_t uxStreamBufferNumber);
@@ -7633,27 +7656,6 @@ traceString xTraceRegisterString(const char *label);
 // file ..\..\..\..\lib\third_party\tracealyzer_recorder\trcSnapshotRecorder.c line 551
 traceHandle xTraceSetISRProperties(const char *name, uint8_t priority);
 
-/*typedef struct xSTREAM_BUFFER*/
-/*{*/
-  /*// xTail*/
-  /*volatile size_t xTail;*/
-  /*// xHead*/
-  /*volatile size_t xHead;*/
-  /*// xLength*/
-  /*size_t xLength;*/
-  /*// xTriggerLevelBytes*/
-  /*size_t xTriggerLevelBytes;*/
-  /*// xTaskWaitingToReceive*/
-  /*volatile TaskHandle_t xTaskWaitingToReceive;*/
-  /*// xTaskWaitingToSend*/
-  /*volatile TaskHandle_t xTaskWaitingToSend;*/
-  /*// pucBuffer*/
-  /*uint8_t *pucBuffer;*/
-  /*// ucFlags*/
-  /*uint8_t ucFlags;*/
-  /*// uxStreamBufferNumber*/
-  /*UBaseType_t uxStreamBufferNumber;*/
-/*} StreamBuffer_t;*/
 
 typedef struct anonymous$71
 {
@@ -11466,21 +11468,6 @@ typedef struct xSTATIC_TIMER
   uint8_t ucDummy7;
 } StaticTimer_t;
 
-/*typedef struct xSTREAM_BUFFER$0*/
-/*{*/
-  /*// uxTail*/
-  /*volatile size_t uxTail;*/
-  /*// uxMid*/
-  /*volatile size_t uxMid;*/
-  /*// uxHead*/
-  /*volatile size_t uxHead;*/
-  /*// uxFront*/
-  /*volatile size_t uxFront;*/
-  /*// LENGTH*/
-  /*size_t LENGTH;*/
-  /*// ucArray*/
-  /*uint8_t ucArray[(signed long long int)sizeof(size_t)];*/
-/*} StreamBuffer_t;*/
 
 typedef struct xTASK_STATUS
 {
@@ -12626,7 +12613,7 @@ static void *pvPubSubClient=NULL;
 static void *pvSendEvent=NULL;
 // pxCurrentTCB
 // file ..\..\..\..\lib\FreeRTOS\tasks.c line 352
-void *pxCurrentTCB=((TCB_t *)NULL);
+TCB_t *pxCurrentTCB=((TCB_t *)NULL);
 // pxCurrentTimerList
 // file ..\..\..\..\lib\FreeRTOS\timers.c line 133
 static List_t *pxCurrentTimerList;
@@ -13087,7 +13074,7 @@ static const JobParamDeterminer_t xJobDocModel[16ll];
 static TickType_t xLastGratuitousARPTime=0u;
 // xLogStreamBuffer
 // file ..\common\application_code\aws_demo_logging.c line 131
-static const StreamBuffer_t *xLogStreamBuffer=((const StreamBuffer_t *)NULL);
+static StreamBuffer_t *xLogStreamBuffer=((const StreamBuffer_t *)NULL);
 // xLogToFile
 // file ..\common\application_code\main.c line 127
 const BaseType_t xLogToFile=0;
@@ -13172,7 +13159,7 @@ static const TickType_t xReceiveTimeOut=(TickType_t)((500u * 1000u) / 1000u);
 static const TickType_t xReceiveTimeOut$link1=(TickType_t)((2000u * 1000u) / 1000u);
 // xRecvBuffer
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\WinPCap\NetworkInterface.c line 129
-static const StreamBuffer_t *xRecvBuffer=((const StreamBuffer_t *)NULL);
+static StreamBuffer_t *xRecvBuffer=((const StreamBuffer_t *)NULL);
 // xSchedulerRunning
 // file ..\..\..\..\lib\FreeRTOS\tasks.c line 386
 static volatile BaseType_t xSchedulerRunning=0;
@@ -13181,7 +13168,7 @@ static volatile BaseType_t xSchedulerRunning=0;
 static List_t xSegmentList;
 // xSendBuffer
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\WinPCap\NetworkInterface.c line 128
-static const StreamBuffer_t *xSendBuffer=((const StreamBuffer_t *)NULL);
+static StreamBuffer_t *xSendBuffer=((const StreamBuffer_t *)NULL);
 // xSendTimeOut
 // file ..\..\..\common\tcp\aws_tcp_echo_client_separate_tasks.c line 95
 static const TickType_t xSendTimeOut=(TickType_t)((2000u * 1000u) / 1000u);
@@ -48113,7 +48100,7 @@ static uint32_t prvBuildJobStatusTopicName(char *pcNameBuffer, uint32_t ulBufSiz
 
 // prvBytesInBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1121
-static size_t prvBytesInBuffer(const StreamBuffer_t * const pxStreamBuffer)
+static size_t prvBytesInBuffer(const StreamBuffer_t1 * const pxStreamBuffer)
 {
   size_t xCount=pxStreamBuffer->xLength + pxStreamBuffer->xHead;
   xCount = xCount - pxStreamBuffer->xTail;
@@ -51126,7 +51113,7 @@ static void prvInitialiseNewQueue(const UBaseType_t uxQueueLength, const UBaseTy
 
 // prvInitialiseNewStreamBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1141
-static void prvInitialiseNewStreamBuffer(StreamBuffer_t * const pxStreamBuffer, uint8_t * const pucBuffer, size_t xBufferSizeBytes, size_t xTriggerLevelBytes, BaseType_t xIsMessageBuffer)
+static void prvInitialiseNewStreamBuffer(StreamBuffer_t1 * const pxStreamBuffer, uint8_t * const pucBuffer, size_t xBufferSizeBytes, size_t xTriggerLevelBytes, BaseType_t xIsMessageBuffer)
 {
   const BaseType_t xWriteValue=0x55;
   void *return_value_memset=memset((void *)pucBuffer, (signed int)xWriteValue, xBufferSizeBytes);
@@ -55175,7 +55162,7 @@ static uint8_t * prvReadAndAssumeCertificate(const uint8_t * const pucCertName, 
 
 // prvReadBytesFromBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1066
-static size_t prvReadBytesFromBuffer(StreamBuffer_t *pxStreamBuffer, uint8_t *pucData, size_t xMaxCount, size_t xBytesAvailable)
+static size_t prvReadBytesFromBuffer(StreamBuffer_t1 *pxStreamBuffer, uint8_t *pucData, size_t xMaxCount, size_t xBytesAvailable)
 {
   size_t xCount;
   size_t xFirstLength;
@@ -55218,7 +55205,7 @@ static size_t prvReadBytesFromBuffer(StreamBuffer_t *pxStreamBuffer, uint8_t *pu
 
 // prvReadMessageFromBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 852
-static size_t prvReadMessageFromBuffer(StreamBuffer_t *pxStreamBuffer, void *pvRxData, size_t xBufferLengthBytes, size_t xBytesAvailable, size_t xBytesToStoreMessageLength)
+static size_t prvReadMessageFromBuffer(StreamBuffer_t1 *pxStreamBuffer, void *pvRxData, size_t xBufferLengthBytes, size_t xBytesAvailable, size_t xBytesToStoreMessageLength)
 {
   size_t xOriginalTail;
   size_t xReceivedLength;
@@ -57271,7 +57258,7 @@ static BaseType_t prvTCPConnectStart(FreeRTOS_Socket_t *pxSocket, struct freerto
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\FreeRTOS_Sockets.c line 2879
 static const StreamBuffer_t * prvTCPCreateStream(FreeRTOS_Socket_t *pxSocket, BaseType_t xIsInputStream)
 {
-  const StreamBuffer_t *pxBuffer;
+  StreamBuffer_t *pxBuffer;
   size_t uxLength;
   size_t uxSize;
   if(!(xIsInputStream == 0))
@@ -57291,8 +57278,8 @@ static const StreamBuffer_t * prvTCPCreateStream(FreeRTOS_Socket_t *pxSocket, Ba
   uxLength = uxLength & ~(sizeof(size_t) /*8ull*/  - 1ull);
   uxSize = (sizeof(const StreamBuffer_t) /*48ull*/  - sizeof(uint8_t [8ll]) /*8ull*/ ) + uxLength;
   void *return_value_pvPortMalloc=pvPortMalloc(uxSize);
-  pxBuffer = (const StreamBuffer_t *)return_value_pvPortMalloc;
-  if(pxBuffer == ((const StreamBuffer_t *)NULL))
+  pxBuffer = ( StreamBuffer_t *)return_value_pvPortMalloc;
+  if(pxBuffer == (( StreamBuffer_t *)NULL))
   {
     while((_Bool)0)
       ;
@@ -58469,7 +58456,7 @@ void prvTraceError(const char *msg)
   vTraceStop();
   if(traceErrorMessage == ((const char *)NULL))
   {
-    traceErrorMessage = (char *)(intptr_t)msg;
+    traceErrorMessage = (char *)(intptr_t) msg;
     if(!(RecorderDataPtr == ((RecorderDataType *)NULL)))
     {
       prvStrncpy(RecorderDataPtr->systemInfo, traceErrorMessage, 80u);
@@ -60138,7 +60125,7 @@ static int16_t prvWriteBlock(OTA_FileContext_t * const C, int32_t iOffset, uint8
 
 // prvWriteBytesToBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1020
-static size_t prvWriteBytesToBuffer(StreamBuffer_t * const pxStreamBuffer, const uint8_t *pucData, size_t xCount)
+static size_t prvWriteBytesToBuffer(StreamBuffer_t1 * const pxStreamBuffer, const uint8_t *pucData, size_t xCount)
 {
   size_t xNextHead;
   size_t xFirstLength;
@@ -60175,7 +60162,7 @@ static size_t prvWriteBytesToBuffer(StreamBuffer_t * const pxStreamBuffer, const
 
 // prvWriteMessageToBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 639
-static size_t prvWriteMessageToBuffer(StreamBuffer_t * const pxStreamBuffer, const void *pvTxData, size_t xDataLengthBytes, size_t xSpace, size_t xRequiredSpace)
+static size_t prvWriteMessageToBuffer(StreamBuffer_t1 * const pxStreamBuffer, const void *pvTxData, size_t xDataLengthBytes, size_t xSpace, size_t xRequiredSpace)
 {
   BaseType_t xShouldWrite;
   size_t xReturn;
@@ -61197,10 +61184,15 @@ static signed int rsa_verify_wrap(void *ctx, mbedtls_md_type_t md_alg, const uns
 // file ..\..\..\..\lib\ota\aws_rsprintf.c line 303
 uint32_t rsprintf(char *dest, const char *fmt, ...)
 {
-  va_list args=(va_list)&fmt + (signed long long int)((sizeof(const char *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  uint32_t iLen=rvsprintf(dest, fmt, args);
-  args = ((va_list)NULL);
-  return iLen;
+	va_list args;
+	va_start(args, fmt);
+	uint32_t iLen = rvsprintf(dest, fmt, args);
+	va_end(args);
+	return iLen;
+// va_list args=(va_list)&fmt + (signed long long int)((sizeof(const char *) [>8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull<]  - 1ull));
+  /*uint32_t iLen=rvsprintf(dest, fmt, args);*/
+  /*args = ((va_list)NULL);*/
+  /*return iLen;*/
 }
 
 // rvsprintf
@@ -61389,15 +61381,6 @@ uint32_t rvsprintf(char *dest, const char *fmt, va_list va)
 
 // scanf_s
 // file C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h line 1307
-inline signed int scanf_s(const char * const _Format, ...)
-{
-  signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const char *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  FILE *return_value___acrt_iob_func=__acrt_iob_func(0u);
-  _Result=_vfscanf_s_l(return_value___acrt_iob_func, _Format, ((const _locale_t)NULL), _ArgList);
-  _ArgList = ((va_list)NULL);
-  return _Result;
-}
 
 // setipv4sourcefilter
 // file C:\Program Files (x86)\Windows Kits\8.1\Include\um\ws2tcpip.h line 681
@@ -61603,9 +61586,11 @@ static signed int sha256_wrap(const unsigned char *input, size_t ilen, unsigned 
 inline signed int sprintf_s(char * const _Buffer, const size_t _BufferCount, const char * const _Format, ...)
 {
   signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const char *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
+  va_list _ArgList;
+	va_start(_ArgList, _Format);
+//  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const char *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
   _Result=_vsprintf_s_l(_Buffer, _BufferCount, _Format, ((const _locale_t)NULL), _ArgList);
-  _ArgList = ((va_list)NULL);
+	va_end(_ArgList);
   return _Result;
 }
 
@@ -61619,14 +61604,14 @@ inline signed int sprintf_s(char * const _Buffer, const size_t _BufferCount, con
 
 // sscanf_s
 // file C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h line 2293
-inline signed int sscanf_s(const char * const _Buffer, const char * const _Format, ...)
-{
-  signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const char *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  _Result=vsscanf_s(_Buffer, _Format, _ArgList);
-  _ArgList = ((va_list)NULL);
-  return _Result;
-}
+/*inline signed int sscanf_s(const char * const _Buffer, const char * const _Format, ...)*/
+/*{*/
+  /*signed int _Result;*/
+ // va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const char *) [>8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull<]  - 1ull));
+  /*_Result=vsscanf_s(_Buffer, _Format, _ArgList);*/
+  /*_ArgList = ((va_list)NULL);*/
+  /*return _Result;*/
+/*}*/
 
 // ssl_append_key_cert
 // file ..\..\..\..\lib\third_party\mbedtls\library\ssl_tls.c line 5993
@@ -64641,36 +64626,36 @@ static inline void sub32(uint32_t *dst, uint32_t src, signed char *carry)
 
 // swprintf_s
 // file C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\corecrt_wstdio.h line 1528
-inline signed int swprintf_s(wchar_t * const _Buffer, const size_t _BufferCount, const wchar_t * const _Format, ...)
-{
-  signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  _Result=_vswprintf_s_l(_Buffer, _BufferCount, _Format, ((const _locale_t)NULL), _ArgList);
-  _ArgList = ((va_list)NULL);
-  return _Result;
-}
+/*inline signed int swprintf_s(wchar_t * const _Buffer, const size_t _BufferCount, const wchar_t * const _Format, ...)*/
+/*{*/
+  /*signed int _Result;*/
+//  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) [>8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull<]  - 1ull));
+  /*_Result=_vswprintf_s_l(_Buffer, _BufferCount, _Format, ((const _locale_t)NULL), _ArgList);*/
+  /*_ArgList = ((va_list)NULL);*/
+  /*return _Result;*/
+/*}*/
 
 // swscanf
 // file C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\corecrt_wstdio.h line 2037
-inline signed int swscanf(const wchar_t * const _Buffer, const wchar_t * const _Format, ...)
-{
-  signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  _Result=_vswscanf_l(_Buffer, _Format, ((const _locale_t)NULL), _ArgList);
-  _ArgList = ((va_list)NULL);
-  return _Result;
-}
+/*inline signed int swscanf(const wchar_t * const _Buffer, const wchar_t * const _Format, ...)*/
+/*{*/
+  /*signed int _Result;*/
+//  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) [>8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull<]  - 1ull));
+  /*_Result=_vswscanf_l(_Buffer, _Format, ((const _locale_t)NULL), _ArgList);*/
+  /*_ArgList = ((va_list)NULL);*/
+  /*return _Result;*/
+/*}*/
 
 // swscanf_s
 // file C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\corecrt_wstdio.h line 2078
-inline signed int swscanf_s(const wchar_t * const _Buffer, const wchar_t * const _Format, ...)
-{
-  signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  _Result=_vswscanf_s_l(_Buffer, _Format, ((const _locale_t)NULL), _ArgList);
-  _ArgList = ((va_list)NULL);
-  return _Result;
-}
+/*inline signed int swscanf_s(const wchar_t * const _Buffer, const wchar_t * const _Format, ...)*/
+/*{*/
+  /*signed int _Result;*/
+//  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) [>8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull<]  - 1ull));
+  /*_Result=_vswscanf_s_l(_Buffer, _Format, ((const _locale_t)NULL), _ArgList);*/
+  /*_ArgList = ((va_list)NULL);*/
+  /*return _Result;*/
+/*}*/
 
 // szH32
 // file ..\..\..\..\lib\ota\aws_rsprintf.c line 235
@@ -64893,7 +64878,7 @@ uint8_t ucQueueGetQueueType(QueueHandle_t xQueue)
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1193
 uint8_t ucStreamBufferGetStreamBufferType(StreamBufferHandle_t xStreamBuffer)
 {
-  return (uint8_t)((signed int)((StreamBuffer_t *)xStreamBuffer)->ucFlags | 1);
+  return (uint8_t)((signed int)((StreamBuffer_t1 *)xStreamBuffer)->ucFlags | 1);
 }
 
 // uiIndexOfObject
@@ -65815,7 +65800,7 @@ UBaseType_t uxQueueSpacesAvailable(const QueueHandle_t xQueue)
 
 // uxStreamBufferAdd
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\FreeRTOS_Stream_Buffer.c line 47
-size_t uxStreamBufferAdd(const StreamBuffer_t *pxBuffer, size_t uxOffset, const uint8_t *pucData, size_t uxCount)
+size_t uxStreamBufferAdd(StreamBuffer_t *pxBuffer, size_t uxOffset, const uint8_t *pucData, size_t uxCount)
 {
   size_t uxSpace;
   size_t uxNextHead;
@@ -65944,7 +65929,7 @@ static inline size_t uxStreamBufferFrontSpace$link1(const StreamBuffer_t *pxBuff
 
 // uxStreamBufferGet
 // file ..\..\..\..\lib\FreeRTOS-Plus-TCP\source\FreeRTOS_Stream_Buffer.c line 130
-size_t uxStreamBufferGet(const StreamBuffer_t *pxBuffer, size_t uxOffset, uint8_t *pucData, size_t uxMaxCount, BaseType_t xPeek)
+size_t uxStreamBufferGet( StreamBuffer_t *pxBuffer, size_t uxOffset, uint8_t *pucData, size_t uxMaxCount, BaseType_t xPeek)
 {
   size_t uxSize;
   size_t uxCount;
@@ -66098,7 +66083,7 @@ static inline size_t uxStreamBufferGetSpace$link4(const StreamBuffer_t *pxBuffer
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1173
 UBaseType_t uxStreamBufferGetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer)
 {
-  return ((StreamBuffer_t *)xStreamBuffer)->uxStreamBufferNumber;
+  return ((StreamBuffer_t1 *)xStreamBuffer)->uxStreamBufferNumber;
 }
 
 // uxStreamBufferMidSpace
@@ -66995,8 +66980,8 @@ void vLoggingInit(BaseType_t vLoggingInit$$xLogToStdout, BaseType_t vLoggingInit
   if(!(xDiskFileLoggingUsed == 0) || !(xStdoutLoggingUsed == 0))
   {
     void *return_value_malloc=malloc((sizeof(const StreamBuffer_t) /*48ull*/  - sizeof(uint8_t [8ll]) /*8ull*/ ) + 32768ull + 1ull);
-    xLogStreamBuffer = (const StreamBuffer_t *)return_value_malloc;
-    if(xLogStreamBuffer == ((const StreamBuffer_t *)NULL))
+    xLogStreamBuffer = (StreamBuffer_t *)return_value_malloc;
+    if(xLogStreamBuffer == (( StreamBuffer_t *)NULL))
       vAssertCalled("..\\common\\application_code\\aws_demo_logging.c", 201u);
 
     memset((void *)xLogStreamBuffer, 0, sizeof(const StreamBuffer_t) /*48ull*/  - sizeof(uint8_t [8ll]) /*8ull*/ );
@@ -67041,7 +67026,8 @@ extern void vLoggingPrintf(const char *pcFormat, ...)
   BaseType_t return_value_FreeRTOS_IsNetworkUp;
   if(!(xDiskFileLoggingUsed == 0) || !(xStdoutLoggingUsed == 0) || !(xUDPLoggingUsed == 0))
   {
-    args = (va_list)&pcFormat + (signed long long int)((sizeof(const char *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
+  //  args = (va_list)&pcFormat + (signed long long int)((sizeof(const char *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
+	  va_start(args, pcFormat);
     BaseType_t return_value_xTaskGetSchedulerState=xTaskGetSchedulerState();
     if(!(return_value_xTaskGetSchedulerState == 1))
       pcTaskName=pcTaskGetName(NULL);
@@ -67067,7 +67053,8 @@ extern void vLoggingPrintf(const char *pcFormat, ...)
     signed int return_value_vsnprintf=vsnprintf(cPrintString + (signed long long int)xLength, 255ull - xLength, pcFormat, args);
     xLength2 = (size_t)return_value_vsnprintf;
     xLength = xLength + xLength2;
-    args = ((va_list)NULL);
+	  va_end(args);
+    /*args = ((va_list)NULL);*/
     pcSource = cPrintString;
     pcTarget = cOutputString;
     while(!((signed int)*pcSource == 0))
@@ -67136,8 +67123,8 @@ extern void vLoggingPrintf(const char *pcFormat, ...)
         iOriginalPriority=GetThreadPriority(xCurrentTask);
         HANDLE return_value_GetCurrentThread=GetCurrentThread();
         SetThreadPriority(return_value_GetCurrentThread, 15);
-        uxStreamBufferAdd(xLogStreamBuffer, 0ull, (const uint8_t *)&xLength, sizeof(size_t) /*8ull*/ );
-        uxStreamBufferAdd(xLogStreamBuffer, 0ull, (const uint8_t *)cOutputString, xLength);
+        uxStreamBufferAdd(xLogStreamBuffer, 0ull, ( uint8_t *)&xLength, sizeof(size_t) /*8ull*/ );
+        uxStreamBufferAdd(xLogStreamBuffer, 0ull, ( uint8_t *)cOutputString, xLength);
         HANDLE return_value_GetCurrentThread$0=GetCurrentThread();
         SetThreadPriority(return_value_GetCurrentThread$0, iOriginalPriority);
       }
@@ -67784,7 +67771,7 @@ void vStartTCPEchoClientTasks_SingleTasks(void)
 
 // vStreamBufferClear
 // file d:\tuttle\freertos\lib\freertos-plus-tcp\include\FreeRTOS_Stream_Buffer.h line 83
-static inline void vStreamBufferClear(const StreamBuffer_t *pxBuffer)
+static inline void vStreamBufferClear(StreamBuffer_t *pxBuffer)
 {
   pxBuffer->uxHead = 0ull;
   pxBuffer->uxTail = 0ull;
@@ -67796,8 +67783,8 @@ static inline void vStreamBufferClear(const StreamBuffer_t *pxBuffer)
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 335
 void vStreamBufferDelete(StreamBufferHandle_t xStreamBuffer)
 {
-  StreamBuffer_t *pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  StreamBuffer_t1 *pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 339u);
 
   if((2 & (signed int)pxStreamBuffer->ucFlags) == 0)
@@ -67809,7 +67796,7 @@ void vStreamBufferDelete(StreamBufferHandle_t xStreamBuffer)
 
 // vStreamBufferMoveMid
 // file d:\tuttle\freertos\lib\freertos-plus-tcp\include\FreeRTOS_Stream_Buffer.h line 194
-static inline void vStreamBufferMoveMid(const StreamBuffer_t *pxBuffer, size_t uxCount)
+static inline void vStreamBufferMoveMid( StreamBuffer_t *pxBuffer, size_t uxCount)
 {
   size_t uxSize=uxStreamBufferMidSpace(pxBuffer);
   if(!(uxSize >= uxCount))
@@ -67825,7 +67812,7 @@ static inline void vStreamBufferMoveMid(const StreamBuffer_t *pxBuffer, size_t u
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 1183
 void vStreamBufferSetStreamBufferNumber(StreamBufferHandle_t xStreamBuffer, UBaseType_t uxStreamBufferNumber)
 {
-  ((StreamBuffer_t *)xStreamBuffer)->uxStreamBufferNumber = uxStreamBufferNumber;
+  ((StreamBuffer_t1 *)xStreamBuffer)->uxStreamBufferNumber = uxStreamBufferNumber;
 }
 
 // vTCPNetStat
@@ -68990,9 +68977,11 @@ void vTracePrint(traceString chn, const char *str)
 // file ..\..\..\..\lib\third_party\tracealyzer_recorder\trcSnapshotRecorder.c line 1311
 void vTracePrintF(traceString eventLabel, const char *formatStr, ...)
 {
-  va_list vl=(va_list)&formatStr + (signed long long int)((sizeof(const char *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
+  va_list vl;
+	va_start(vl, formatStr);
   vTracePrintF_Helper(eventLabel, formatStr, vl);
-  vl = ((va_list)NULL);
+  /*vl = ((va_list)NULL);*/
+	va_end(vl);
 }
 
 // vTracePrintF_Helper
@@ -69797,15 +69786,6 @@ static inline _Bool would_overflow(CborEncoder *encoder, size_t len)
 
 // wprintf_s
 // file C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\corecrt_wstdio.h line 640
-inline signed int wprintf_s(const wchar_t * const _Format, ...)
-{
-  signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  FILE *return_value___acrt_iob_func=__acrt_iob_func(1u);
-  _Result=_vfwprintf_s_l(return_value___acrt_iob_func, _Format, ((const _locale_t)NULL), _ArgList);
-  _ArgList = ((va_list)NULL);
-  return _Result;
-}
 
 // writeInt16
 // file ..\..\..\..\lib\third_party\tracealyzer_recorder\trcSnapshotRecorder.c line 773
@@ -69894,27 +69874,9 @@ static uint8_t writeInt8(void *buffer, uint8_t i, uint8_t value)
 
 // wscanf
 // file C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\corecrt_wstdio.h line 928
-inline signed int wscanf(const wchar_t * const _Format, ...)
-{
-  signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  FILE *return_value___acrt_iob_func=__acrt_iob_func(0u);
-  _Result=_vfwscanf_l(return_value___acrt_iob_func, _Format, ((const _locale_t)NULL), _ArgList);
-  _ArgList = ((va_list)NULL);
-  return _Result;
-}
 
 // wscanf_s
 // file C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\corecrt_wstdio.h line 965
-inline signed int wscanf_s(const wchar_t * const _Format, ...)
-{
-  signed int _Result;
-  va_list _ArgList=(va_list)&_Format + (signed long long int)((sizeof(const wchar_t *) /*8ull*/  + sizeof(signed int) /*4ull*/ ) - 1ull & ~(sizeof(signed int) /*4ull*/  - 1ull));
-  FILE *return_value___acrt_iob_func=__acrt_iob_func(0u);
-  _Result=_vfwscanf_s_l(return_value___acrt_iob_func, _Format, ((const _locale_t)NULL), _ArgList);
-  _ArgList = ((va_list)NULL);
-  return _Result;
-}
 
 // x509_check_wildcard
 // file ..\..\..\..\lib\third_party\mbedtls\library\x509_crt.c line 1773
@@ -73809,7 +73771,7 @@ StreamBufferHandle_t xStreamBufferGenericCreate(size_t xBufferSizeBytes, size_t 
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 271
 StreamBufferHandle_t xStreamBufferGenericCreateStatic(size_t xBufferSizeBytes, size_t xTriggerLevelBytes, BaseType_t xIsMessageBuffer, uint8_t * const pucStreamBufferStorageArea, StaticStreamBuffer_t * const pxStaticStreamBuffer)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)pxStaticStreamBuffer;
+  StreamBuffer_t1 * pxStreamBuffer=(StreamBuffer_t1 *)pxStaticStreamBuffer;
   StreamBufferHandle_t xReturn;
   if(pucStreamBufferStorageArea == ((uint8_t *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 280u);
@@ -73846,10 +73808,10 @@ StreamBufferHandle_t xStreamBufferGenericCreateStatic(size_t xBufferSizeBytes, s
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 902
 BaseType_t xStreamBufferIsEmpty(StreamBufferHandle_t xStreamBuffer)
 {
-  const StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  const StreamBuffer_t1 * pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   BaseType_t xReturn;
   size_t xTail;
-  if(pxStreamBuffer == ((const StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 908u);
 
   xTail = pxStreamBuffer->xTail;
@@ -73867,8 +73829,8 @@ BaseType_t xStreamBufferIsFull(StreamBufferHandle_t xStreamBuffer)
 {
   BaseType_t xReturn;
   size_t xBytesToStoreMessageLength;
-  const StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
-  if(pxStreamBuffer == ((const StreamBuffer_t *)NULL))
+  const StreamBuffer_t1 * pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 931u);
 
   if(!((1 & (signed int)pxStreamBuffer->ucFlags) == 0))
@@ -73913,14 +73875,14 @@ static inline BaseType_t xStreamBufferLessThenEqual(const StreamBuffer_t *pxBuff
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 691
 size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer, void *pvRxData, size_t xBufferLengthBytes, TickType_t xTicksToWait)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  StreamBuffer_t1 * pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   size_t xReceivedLength=0ull;
   size_t xBytesAvailable;
   size_t xBytesToStoreMessageLength;
   if(pvRxData == NULL)
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 699u);
 
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 700u);
 
   if(!((1 & (signed int)pxStreamBuffer->ucFlags) == 0))
@@ -73977,10 +73939,10 @@ size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer, void *pvRxData, 
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 990
 BaseType_t xStreamBufferReceiveCompletedFromISR(StreamBufferHandle_t xStreamBuffer, BaseType_t *pxHigherPriorityTaskWoken)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  StreamBuffer_t1 *  pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   BaseType_t xReturn;
   UBaseType_t uxSavedInterruptStatus;
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 996u);
 
   uxSavedInterruptStatus = 0ul;
@@ -74001,14 +73963,14 @@ BaseType_t xStreamBufferReceiveCompletedFromISR(StreamBufferHandle_t xStreamBuff
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 795
 size_t xStreamBufferReceiveFromISR(StreamBufferHandle_t xStreamBuffer, void *pvRxData, size_t xBufferLengthBytes, BaseType_t * const pxHigherPriorityTaskWoken)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  StreamBuffer_t1 *  pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   size_t xReceivedLength=0ull;
   size_t xBytesAvailable;
   size_t xBytesToStoreMessageLength;
   if(pvRxData == NULL)
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 803u);
 
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 804u);
 
   if(!((1 & (signed int)pxStreamBuffer->ucFlags) == 0))
@@ -74041,11 +74003,11 @@ size_t xStreamBufferReceiveFromISR(StreamBufferHandle_t xStreamBuffer, void *pvR
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 368
 BaseType_t xStreamBufferReset(StreamBufferHandle_t xStreamBuffer)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  StreamBuffer_t1 * pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   BaseType_t xReturn=0;
   BaseType_t xIsMessageBuffer;
   UBaseType_t uxStreamBufferNumber;
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 377u);
 
   uxStreamBufferNumber = pxStreamBuffer->uxStreamBufferNumber;
@@ -74072,7 +74034,7 @@ BaseType_t xStreamBufferReset(StreamBufferHandle_t xStreamBuffer)
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 487
 size_t xStreamBufferSend(StreamBufferHandle_t xStreamBuffer, const void *pvTxData, size_t xDataLengthBytes, TickType_t xTicksToWait)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  StreamBuffer_t1 *  pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   size_t xReturn;
   size_t xSpace=0ull;
   size_t xRequiredSpace=xDataLengthBytes;
@@ -74080,7 +74042,7 @@ size_t xStreamBufferSend(StreamBufferHandle_t xStreamBuffer, const void *pvTxDat
   if(pvTxData == NULL)
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 497u);
 
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 498u);
 
   if(!((1 & (signed int)pxStreamBuffer->ucFlags) == 0))
@@ -74144,10 +74106,10 @@ size_t xStreamBufferSend(StreamBufferHandle_t xStreamBuffer, const void *pvTxDat
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 960
 BaseType_t xStreamBufferSendCompletedFromISR(StreamBufferHandle_t xStreamBuffer, BaseType_t *pxHigherPriorityTaskWoken)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  StreamBuffer_t1 *  pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   BaseType_t xReturn;
   UBaseType_t uxSavedInterruptStatus;
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 966u);
 
   uxSavedInterruptStatus = 0ul;
@@ -74168,14 +74130,14 @@ BaseType_t xStreamBufferSendCompletedFromISR(StreamBufferHandle_t xStreamBuffer,
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 588
 size_t xStreamBufferSendFromISR(StreamBufferHandle_t xStreamBuffer, const void *pvTxData, size_t xDataLengthBytes, BaseType_t * const pxHigherPriorityTaskWoken)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  StreamBuffer_t1 *  pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   size_t xReturn;
   size_t xSpace;
   size_t xRequiredSpace=xDataLengthBytes;
   if(pvTxData == NULL)
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 597u);
 
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 598u);
 
   if(!((1 & (signed int)pxStreamBuffer->ucFlags) == 0))
@@ -74207,9 +74169,9 @@ size_t xStreamBufferSendFromISR(StreamBufferHandle_t xStreamBuffer, const void *
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 422
 BaseType_t xStreamBufferSetTriggerLevel(StreamBufferHandle_t xStreamBuffer, size_t xTriggerLevel)
 {
-  StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+  StreamBuffer_t1 *  pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   BaseType_t xReturn;
-  if(pxStreamBuffer == ((StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == ((StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 427u);
 
   if(xTriggerLevel == 0ull)
@@ -74230,9 +74192,9 @@ BaseType_t xStreamBufferSetTriggerLevel(StreamBufferHandle_t xStreamBuffer, size
 // file ..\..\..\..\lib\FreeRTOS\stream_buffer.c line 451
 size_t xStreamBufferSpacesAvailable(StreamBufferHandle_t xStreamBuffer)
 {
-  const StreamBuffer_t * const pxStreamBuffer=(StreamBuffer_t *)xStreamBuffer;
+   StreamBuffer_t1 *  pxStreamBuffer=(StreamBuffer_t1 *)xStreamBuffer;
   size_t xSpace;
-  if(pxStreamBuffer == ((const StreamBuffer_t *)NULL))
+  if(pxStreamBuffer == (( StreamBuffer_t1 *)NULL))
     vAssertCalled("..\\..\\..\\..\\lib\\FreeRTOS\\stream_buffer.c", 456u);
 
   xSpace = pxStreamBuffer->xLength + pxStreamBuffer->xTail;
