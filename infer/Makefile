@@ -61,7 +61,7 @@ endif
 	$(CC) $(CFLAGS) $(INC) -c $< -o $@
 
 infer:
-	$(INFER) $(INFERBO) run -- $(MAKE)
+	$(INFER) $(INFERBO) run -- clang -c $(INC) $(ENTRY).c
 
 clean:
 	$(RM) -r $(INFEROUT) 
